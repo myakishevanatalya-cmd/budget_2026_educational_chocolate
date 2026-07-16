@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Budget 2026 - interactive presentation</title>
+<style>
+:root{
+  --bg:#0b1020; --bg2:#101936; --card:#141b36; --card2:#10162c; --text:#f5f7ff; --muted:#aeb7d6;
+  --line:#2a3358; --accent:#ffb347; --blue:#5aa7ff; --green:#35c48c; --red:#ff5c7a; --yellow:#ffd166;
+  --shadow:0 18px 38px rgba(0,0,0,.35); --radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at top left,#1d2856 0,#0b1020 42%,#050711 100%);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);line-height:1.5}
+.layout{display:grid;grid-template-columns:280px 1fr;gap:22px;max-width:1480px;margin:0 auto;padding:22px}
+.nav{position:sticky;top:18px;height:calc(100vh - 36px);overflow:auto;background:rgba(11,16,32,.88);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.nav h3{margin:0 0 10px;color:var(--accent);font-size:16px}.nav a{display:block;color:var(--muted);text-decoration:none;padding:7px 8px;border-radius:10px;font-size:13px}.nav a:hover{background:rgba(255,179,71,.12);color:var(--text)}
+.main{min-width:0}.hero{background:linear-gradient(135deg,rgba(255,179,71,.18),rgba(90,167,255,.08));border:1px solid rgba(255,179,71,.45);border-radius:24px;padding:28px;box-shadow:var(--shadow);margin-bottom:20px}
+.hero h1{font-size:34px;margin:0 0 8px}.hero p{max-width:920px;color:var(--muted);margin:0 0 14px}.tag{display:inline-flex;gap:8px;align-items:center;padding:5px 11px;border:1px solid rgba(255,255,255,.16);border-radius:999px;color:var(--muted);font-size:12px;margin-right:8px;background:rgba(0,0,0,.18)}.dot{width:8px;height:8px;border-radius:99px;background:var(--accent)}
+section{background:rgba(16,22,44,.88);border:1px solid var(--line);border-radius:22px;padding:22px;margin-bottom:20px;box-shadow:var(--shadow)}
+h2{font-size:25px;margin:0 0 8px}h3{font-size:18px;margin:18px 0 8px}p{color:var(--muted);font-size:14px;margin:6px 0 12px}.muted{color:var(--muted)}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:14px;margin-top:16px}.kpi{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.11);border-radius:16px;padding:14px;position:relative;overflow:hidden}.kpi:before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}.kpi.good:before{background:var(--green)}.kpi.bad:before{background:var(--red)}.kpi.blue:before{background:var(--blue)}
+.kpi .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.kpi .value{font-size:25px;font-weight:700;margin-top:4px}.kpi .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:rgba(8,12,30,.72);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:16px}.card h3{margin-top:0}.controls{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;align-items:start}.scenario{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);color:var(--text);border-radius:999px;padding:8px 13px;cursor:pointer;font-size:13px}.btn.active{background:rgba(255,179,71,.22);border-color:var(--accent);color:var(--accent);font-weight:700}.button-decision{display:inline-flex;align-items:center;gap:8px;background:rgba(255,179,71,.18);border:1px solid rgba(255,179,71,.45);border-radius:999px;color:var(--accent);padding:8px 13px;font-weight:700;font-size:13px}.button-discuss{display:inline-flex;align-items:center;gap:8px;background:rgba(90,167,255,.13);border:1px solid rgba(90,167,255,.42);border-radius:999px;color:#b7d8ff;padding:8px 13px;font-weight:700;font-size:13px}
+.slider-row{display:grid;grid-template-columns:170px 1fr 64px;gap:12px;align-items:center;margin:10px 0}.slider-row label{font-size:13px;color:var(--muted)}input[type=range]{width:100%;accent-color:var(--accent)}.pill{display:inline-flex;border-radius:999px;padding:3px 8px;font-size:11px;border:1px solid rgba(255,255,255,.16);color:var(--muted);background:rgba(0,0,0,.2)}.pill.good{color:var(--green);border-color:rgba(53,196,140,.5)}.pill.warn{color:var(--yellow);border-color:rgba(255,209,102,.5)}.pill.bad{color:var(--red);border-color:rgba(255,92,122,.5)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;overflow:hidden;border-radius:12px}th,td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.07);vertical-align:top}th{color:var(--muted);text-transform:uppercase;font-size:11px;letter-spacing:.05em;background:rgba(255,255,255,.04)}td.num,th.num{text-align:right;white-space:nowrap}tr:hover td{background:rgba(255,255,255,.025)}
+.note{border-left:4px solid var(--accent);background:rgba(255,179,71,.08);border-radius:12px;padding:12px 14px;margin-top:12px;color:var(--muted);font-size:14px}.risk{border-left:4px solid var(--red);background:rgba(255,92,122,.08)}.ok{border-left:4px solid var(--green);background:rgba(53,196,140,.08)}
+.chart-box{height:320px;background:rgba(0,0,0,.12);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px;margin-top:12px}svg{width:100%;height:100%;display:block}.axis text{fill:var(--muted);font-size:11px}.axis line,.axis path{stroke:rgba(255,255,255,.15)}.bar-label{fill:var(--text);font-size:12px}.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.sku-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}.action{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:12px}.action strong{color:var(--text)}.action ul{margin:6px 0 0 18px;color:var(--muted);font-size:13px;padding:0}
+.footer{color:var(--muted);font-size:12px;text-align:center;padding:20px 0}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.nav{position:relative;height:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3,.controls,.sku-actions{grid-template-columns:1fr}}
+@media(max-width:650px){.kpi-grid{grid-template-columns:1fr}.hero h1{font-size:26px}.slider-row{grid-template-columns:1fr}.layout{padding:12px}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="nav">
+    <h3>Навигация</h3>
+    <a href="#intro">1. Картина бюджета</a>
+    <a href="#model">2. Интерактивная модель</a>
+    <a href="#pnl">3. БДР и структура расходов</a>
+    <a href="#monthly">4. Сезонность и денежный поток</a>
+    <a href="#sku">5. Unit-экономика по SKU</a>
+    <a href="#cost">6. Себестоимость и спецификации</a>
+    <a href="#tax">7. Налоги и чистая прибыль</a>
+    <a href="#balance">8. БДДС и Баланс</a>
+    <a href="#channels">9. Каналы сбыта</a>
+    <a href="#decisions">10. Решения руководства</a>
+  </aside>
+  <main class="main">
+    <div class="hero" id="intro">
+      <div class="tag"><span class="dot"></span> бюджет 2026</div><div class="tag">интерактивная защита</div>
+      <h1>Бюджет 2026: что зарабатываем, где теряем и какие решения нужны</h1>
+      <p>Презентация для руководства производственно-торговой компании, работающей на маркетплейсах и собственном производстве. Цель: показать экономику бюджета, слабые места, драйверы прибыли и решения, необходимые для утверждения бюджета.</p>
+      <div class="note"><b>Как читать:</b> показатели в интерактивной панели являются управленческой моделью чувствительности. Точные решения по товарам принимаются по unit-экономике в разрезе SKU и канала.</div>
+    </div>
+
+    <section>
+      <h2>1. Ключевые показатели бюджета</h2>
+      <p>Бюджет показывает высокий оборот и положительную прибыль, но запас прочности слабый: расходы маркетплейсов забирают большую часть маржи, а денежный поток требует контроля.</p>
+      <div class="kpi-grid">
+        <div class="kpi blue"><div class="label">Выручка</div><div class="value" id="kpiRevenue">854,3</div><div class="sub">млн руб., после исключения НДС по ВБ</div></div>
+        <div class="kpi good"><div class="label">MR1 после производства</div><div class="value" id="kpiMr1">569,0</div><div class="sub">млн руб., маржа <span id="kpiMr1Pct">66,6%</span></div></div>
+        <div class="kpi bad"><div class="label">Расходы маркетплейсов</div><div class="value" id="kpiMp">475,3</div><div class="sub">млн руб., доля <span id="kpiMpPct">55,6%</span></div></div>
+        <div class="kpi"><div class="label">MR2</div><div class="value" id="kpiMr2">93,7</div><div class="sub">млн руб., маржа <span id="kpiMr2Pct">11,0%</span></div></div>
+        <div class="kpi"><div class="label">Операционная прибыль</div><div class="value" id="kpiOp">63,0</div><div class="sub">млн руб., рентабельность <span id="kpiOpPct">7,4%</span></div></div>
+        <div class="kpi good"><div class="label">Чистая прибыль</div><div class="value" id="kpiNet">22,3</div><div class="sub">млн руб., чистая маржа <span id="kpiNetPct">2,6%</span></div></div>
+        <div class="kpi blue"><div class="label">Чистый денежный поток</div><div class="value" id="kpiCashFlow">11,9</div><div class="sub">млн руб. за год</div></div>
+        <div class="kpi"><div class="label">Деньги на конец</div><div class="value" id="kpiCashEnd">13,3</div><div class="sub">млн руб., по данным БДДС</div></div>
+      </div>
+      <div class="note"><b>Вывод:</b> производственная экономика выглядит рабочей, но бизнес становится зависимым от условий маркетплейсов. Главная задача утверждения бюджета - не только принять план, а зафиксировать правила управления маржей, ассортиментом, ценами и деньгами.</div>
+    </section>
+
+    <section id="model">
+      <h2>2. Интерактивная модель чувствительности</h2>
+      <p>Переключите сценарий и измените параметры. Модель показывает, как цена, себестоимость, расходы маркетплейсов и налоги влияют на прибыль и денежный поток.</p>
+      <div class="controls">
+        <div class="card">
+          <h3>Сценарий</h3>
+          <div class="scenario">
+            <button class="btn" data-scenario="pessimistic">Пессимистичный</button>
+            <button class="btn active" data-scenario="base">Реалистичный</button>
+            <button class="btn" data-scenario="optimistic">Оптимистичный</button>
+          </div>
+          <p class="muted">Сценарии меняют объем продаж, расходы маркетплейсов, себестоимость и налоги. Это нужно для понимания чувствительности бюджета, а не для замены детального Excel-расчета.</p>
+        </div>
+        <div class="card">
+          <h3>Бегунки параметров</h3>
+          <div class="slider-row"><label>Цена / средний чек</label><input id="priceDelta" type="range" min="-10" max="20" value="0" step="1"><span id="priceDeltaLbl">0%</span></div>
+          <div class="slider-row"><label>Материалы</label><input id="materialDelta" type="range" min="-15" max="25" value="0" step="1"><span id="materialDeltaLbl">0%</span></div>
+          <div class="slider-row"><label>Работы и цех</label><input id="workDelta" type="range" min="-10" max="20" value="0" step="1"><span id="workDeltaLbl">0%</span></div>
+          <div class="slider-row"><label>Расходы МП</label><input id="mpDelta" type="range" min="-8" max="8" value="0" step="1"><span id="mpDeltaLbl">0 п.п.</span></div>
+          <div class="slider-row"><label>Налоги и обязательные платежи</label><input id="taxDelta" type="range" min="-15" max="20" value="0" step="1"><span id="taxDeltaLbl">0%</span></div>
+        </div>
+      </div>
+      <div class="chart-box"><svg id="waterfallChart"></svg></div>
+      <div class="note"><b>Что видим:</b> даже небольшое ухудшение расходов маркетплейсов или себестоимости быстро снижает чистую прибыль. При росте цены положительный эффект есть, но он ограничен, потому что спрос частично проседает.</div>
+      <div style="margin-top:10px"><span class="button-decision">Принять решение: утвердить пороги MR2</span> <span class="button-discuss">Обсудить: предел промо и скидок</span></div>
+    </section>
+
+    <section id="pnl">
+      <h2>3. БДР: структура доходов и расходов</h2>
+      <p>В таблице показана управленческая расшифровка бюджета доходов и расходов. Основной фактор давления на прибыль - маркетплейсы.</p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Структура бюджета</h3>
+          <table>
+            <thead><tr><th>Статья</th><th class="num">Сумма, млн руб.</th><th class="num">Доля выручки</th><th>Пояснение</th></tr></thead>
+            <tbody id="pnlTable"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Диаграмма структуры расходов</h3>
+          <div class="chart-box" style="height:360px"><svg id="expenseChart"></svg></div>
+        </div>
+      </div>
+      <div class="note"><b>Вывод:</b> производственная себестоимость и управленческие расходы контролируемы. Главная зона решения - комиссия, логистика, продвижение и условия работы с маркетплейсами.</div>
+    </section>
+
+    <section id="monthly">
+      <h2>4. Сезонность, выручка и деньги</h2>
+      <p>Бизнес зависит от пиков в первом квартале и конце года. Производство и закупки нужно готовить заранее, иначе касса и поставки будут в стрессе.</p>
+      <div class="chart-box"><svg id="monthlyChart"></svg></div>
+      <div class="note risk"><b>Риск:</b> положительный годовой денежный поток не гарантирует отсутствие кассовых разрывов внутри года. Нужно управлять минимальным остатком денег и платежным календарем.</div>
+      <div style="margin-top:10px"><span class="button-decision">Принять решение: минимальный денежный резерв на 3-4 недели платежей</span></div>
+    </section>
+
+    <section id="sku">
+      <h2>5. Unit-экономика по SKU и каналам</h2>
+      <p><b>SKU</b> - конкретная товарная позиция. <b>Unit-экономика</b> - прибыль или убыток с одной продажи. <b>MR2 - маржинальная рентабельность с учетом расходов на маркетплейс</b> (комиссия, логистика, продвижение, хранение, платная приемка, эквайринг, кросс-докинг, штрафы и возвраты).</p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>MR2 по SKU: WB и Ozon</h3>
+          <div class="chart-box" style="height:420px"><svg id="skuChart"></svg></div>
+        </div>
+        <div class="card">
+          <h3>Расчет по SKU</h3>
+          <table>
+            <thead><tr><th>SKU</th><th class="num">Цена</th><th class="num">Себестоимость</th><th class="num">MR2 WB</th><th class="num">MR2 Ozon</th><th>Решение</th></tr></thead>
+            <tbody id="skuTable"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sku-actions">
+        <div class="action"><strong>Зеленые SKU</strong><ul><li>Шоколадка WB и Ozon - масштабировать при контроле сырья.</li><li>Автопарфюм WB и Ozon - сохранить, проверить цену жидкости и рекламы.</li><li>Чай WB - развивать как прибыльный подарочный продукт.</li></ul></div>
+        <div class="action"><strong>Желтые SKU</strong><ul><li>Конфеты Ozon - не увеличивать промо до выхода MR2 выше 15%.</li><li>СПА WB - пересобрать себестоимость или повысить цену.</li><li>Свечи WB - развивать осторожно, контролировать себестоимость воска и работ.</li></ul></div>
+        <div class="action"><strong>Красные SKU</strong><ul><li>СПА Ozon - временно вывести или повысить цену, убыток около 145 руб. на единицу.</li><li>Свечи Ozon - остановить промо и новые поставки, убыток около 38 руб. на единицу.</li><li>Чай Ozon - ограничить, MR2 около 4%, после накладных расходов почти ноль.</li></ul></div>
+        <div class="action"><strong>Правило</strong><ul><li>WB: целевой MR2 не ниже 20%.</li><li>Ozon: целевой MR2 не ниже 15%.</li><li>Отрицательный MR2 - только распродажа остатка или утвержденный тест.</li></ul></div>
+      </div>
+      <div class="note"><b>Вывод:</b> проблема не в товарах как таковых, а в сочетании SKU, цены, себестоимости и канала. Один товар может быть прибыльным на WB и убыточным на Ozon.</div>
+      <div style="margin-top:10px"><span class="button-decision">Принять решение: список SKU на вывод, пересборку и масштабирование</span></div>
+    </section>
+
+    <section id="cost">
+      <h2>6. Себестоимость: материалы и работы</h2>
+      <p>Себестоимость складывается из материалов, упаковки, работ и общепроизводственных расходов. Для красных SKU нужно не просто снижать затраты, а менять спецификацию с контролем качества и отзывов.</p>
+      <div class="grid-2">
+        <div class="card"><h3>Влияние материалов и работ на MR2</h3><div class="chart-box"><svg id="costSensitivityChart"></svg></div></div>
+        <div class="card"><h3>Конкретные предложения</h3><table><thead><tr><th>SKU</th><th>Что сделать</th><th>Цель</th></tr></thead><tbody>
+          <tr><td>СПА</td><td>пересмотреть дорогие масла, кокосовую половинку, упаковку, трудоемкость</td><td>снизить себестоимость на 8-10%</td></tr>
+          <tr><td>Свечи</td><td>унифицировать ароматы, укрупнить партии, проверить норму труда</td><td>снизить трудоемкость и отдушки</td></tr>
+          <tr><td>Чай</td><td>проверить навеску, заменить дорогие купажи, сделать лайт-версию для Ozon</td><td>вернуть Ozon выше MR2 15%</td></tr>
+          <tr><td>Автопарфюм</td><td>проверить единицу цены жидкости и цену флаконов</td><td>исключить ошибку себестоимости</td></tr>
+          <tr><td>Шоколад</td><td>контракты с поставщиками и контроль цены шоколада</td><td>не допустить просадки маржи при росте сырья</td></tr>
+        </tbody></table></div>
+      </div>
+      <div class="note"><b>Вывод:</b> снижение себестоимости должно идти через тестовые партии, а не через резкое удешевление качества. Для каждого изменения нужны срок, ответственный, экономический эффект и риск возвратов.</div>
+    </section>
+
+    <section id="tax">
+      <h2>7. Налоги: влияние на чистую прибыль и денежный поток</h2>
+      <p>Налоги рассчитаны по нескольким юрлицам и режимам. Для руководства важно видеть, что налоговая нагрузка напрямую влияет не только на чистую прибыль, но и на денежный поток.</p>
+      <div class="grid-2">
+        <div class="card"><h3>Налоговый мост</h3><table><thead><tr><th>Налог</th><th class="num">Начислено, млн руб.</th><th class="num">Уплачено, млн руб.</th></tr></thead><tbody id="taxTable"></tbody></table></div>
+        <div class="card"><h3>Влияние налогов</h3><div class="chart-box"><svg id="taxChart"></svg></div></div>
+      </div>
+      <div class="note"><b>Вывод:</b> налоговую нагрузку нельзя обсуждать отдельно от структуры группы, поставщиков с НДС и движения денег. Нужен налоговый мост по каждому юрлицу и виду налога.</div>
+      <div style="margin-top:10px"><span class="button-discuss">Обсудить: налоговая структура и поставщики с НДС</span></div>
+    </section>
+
+    <section id="balance">
+      <h2>8. БДДС и прогнозный Баланс</h2>
+      <p>БДДС показывает, как операционные решения превращаются в деньги. Важно смотреть не только годовой итог, но и помесячные провалы: отрицательные месяцы требуют заранее согласованного источника финансирования.</p>
+      <div class="card">
+        <h3>График движения денежных средств</h3>
+        <p>Столбцы показывают чистый денежный поток по месяцам, линия - накопительный остаток денежных средств с учетом входящего остатка. Это помогает увидеть месяцы, где нужен резерв или финансирование.</p>
+        <div class="chart-box"><svg id="cashMovementChart"></svg></div>
+        <div class="legend"><span><i style="background:#35c48c"></i>положительный поток</span><span><i style="background:#ff5c7a"></i>отрицательный поток</span><span><i style="background:#ffb347"></i>остаток денег</span></div>
+        <div class="note risk"><b>Что видим и какой вывод:</b> даже при положительном годовом денежном потоке отдельные месяцы могут быть отрицательными. Решение руководства - утвердить минимальный денежный резерв и правила использования кредитной линии или отсрочек поставщиков.</div>
+      </div>
+      <div class="grid-2" style="margin-top:16px">
+        <div class="card"><h3>Активы</h3><table><thead><tr><th>Статья</th><th class="num">2026, млн руб.</th></tr></thead><tbody>
+          <tr><td>Денежные средства</td><td class="num">13,3</td></tr><tr><td>Дебиторская задолженность</td><td class="num">30,4</td></tr><tr><td>Запасы и товары на маркетплейсах</td><td class="num">62,1</td></tr><tr><td>Внеоборотные активы</td><td class="num">1,8</td></tr><tr><td><b>Итого активы</b></td><td class="num"><b>107,5</b></td></tr>
+        </tbody></table></div>
+        <div class="card"><h3>Пассивы</h3><table><thead><tr><th>Статья</th><th class="num">2026, млн руб.</th></tr></thead><tbody>
+          <tr><td>Кредиты и займы</td><td class="num">5,2</td></tr><tr><td>Задолженность поставщикам</td><td class="num">65,2</td></tr><tr><td>Налоговая задолженность</td><td class="num">17,0</td></tr><tr><td>Накопленный убыток</td><td class="num">-19,7</td></tr><tr><td><b>Итого пассивы</b></td><td class="num"><b>107,5</b></td></tr>
+        </tbody></table></div>
+      </div>
+      <div class="note risk"><b>Риск:</b> кредиторская задолженность поставщикам составляет около 65,2 млн руб. Это означает, что устойчивость бюджета зависит от отсрочек и дисциплины платежей поставщикам.</div>
+    </section>
+
+    <section id="channels">
+      <h2>9. Каналы сбыта: как снизить зависимость от маркетплейсов</h2>
+      <p>Маркетплейсы дают объем, но забирают маржу и клиентские данные. Задача - не уходить с маркетплейсов, а запустить альтернативные каналы и сравнить их по экономике.</p>
+      <div class="grid-3">
+        <div class="card"><h3>B2B и подарочный календарь</h3><p>Годовые программы подарков для сотрудников и клиентов. Снижает сезонность и дает предоплату.</p><span class="pill good">MR2 цель 25%+</span></div>
+        <div class="card"><h3>Private label</h3><p>Наборы под брендом заказчика: банки, отели, клиники, застройщики, корпоративные клиенты.</p><span class="pill good">MR2 цель 20-25%</span></div>
+        <div class="card"><h3>Предзаказы</h3><p>Сезонные и лимитированные коллекции сначала продаются, затем производятся. Меньше запасов и кассового риска.</p><span class="pill good">предоплата</span></div>
+        <div class="card"><h3>Собственный сайт</h3><p>Пилот на 10-15 SKU. Главная метрика - стоимость привлечения клиента и повторные заказы.</p><span class="pill warn">MR2 цель 20%+</span></div>
+        <div class="card"><h3>Оптовые партнеры</h3><p>Подарочные магазины, цветочные сети, SPA, отели, салоны красоты. Нужны минимальная партия и условия возврата.</p><span class="pill warn">MR2 цель 15-20%</span></div>
+        <div class="card"><h3>Event и агентства</h3><p>Партнерский канал для крупных событий и корпоративных подарков. Комиссия только после оплаты клиента.</p><span class="pill warn">MR2 цель 20%+</span></div>
+      </div>
+      <div class="note"><b>Вывод:</b> альтернативные каналы нужно запускать как 90-дневный портфель пилотов. Масштабируем только те каналы, которые подтвердят MR2, срок получения денег и повторные продажи.</div>
+      <div style="margin-top:10px"><span class="button-decision">Принять решение: утвердить 90-дневный план пилотов</span></div>
+    </section>
+
+    <section id="decisions">
+      <h2>10. Итоговые решения для утверждения бюджета</h2>
+      <p>Бюджет можно утверждать как базовый сценарий только вместе с управленческими условиями. Ниже - проект решения для руководства.</p>
+      <table>
+        <thead><tr><th>Блок</th><th>Решение</th><th>Ответственный</th><th>Срок</th><th>KPI</th></tr></thead>
+        <tbody>
+          <tr><td>MR2 и SKU</td><td>ввести отчет SKU x канал, порог WB 20%, Ozon 15%</td><td>финансовый директор</td><td>2 недели</td><td>0 SKU с отрицательным MR2 без решения</td></tr>
+          <tr><td>Маркетплейсы</td><td>ограничить Ozon по СПА, свечам и чаю, разные цены по каналам</td><td>директор продаж</td><td>1 месяц</td><td>MR2 Ozon не ниже 15%</td></tr>
+          <tr><td>Промо</td><td>каждая акция имеет бюджет, срок и стоп-лосс</td><td>маркетинг</td><td>1 месяц</td><td>дополнительный MR2 положительный</td></tr>
+          <tr><td>Производство</td><td>пересборка СПА, свечей, чая и проверка автопарфюма</td><td>производство</td><td>Q1-Q2</td><td>снижение себестоимости 5-10%</td></tr>
+          <tr><td>Поставщики</td><td>по критичным материалам 2-3 альтернативы, приоритет НДС</td><td>закупки</td><td>Q1</td><td>нет единственного поставщика</td></tr>
+          <tr><td>Деньги</td><td>минимальный резерв на 3-4 недели критических платежей</td><td>финансовый директор</td><td>1 месяц</td><td>остаток выше лимита</td></tr>
+          <tr><td>Каналы</td><td>запустить B2B, private label, сайт и предзаказы как пилоты</td><td>коммерческий директор</td><td>90 дней</td><td>MR2 и повторные продажи</td></tr>
+        </tbody>
+      </table>
+      <div class="note"><b>Что еще улучшить в управлении бюджетом:</b> добавить еженедельный платежный календарь, автоматический отчет MR2 по SKU и каналам, контроль рекламного стоп-лосса, отдельный реестр поставщиков с НДС и регулярный квартальный пересмотр бюджета при изменении комиссий маркетплейсов или цен сырья.</div>
+      <div class="note ok"><b>Рекомендуемое решение:</b> утвердить бюджет 2026 года как базовый сценарий при условии запуска системы MR2, пересмотра проблемных SKU, контроля промо, политики поставщиков, минимального денежного резерва и 90-дневного портфеля альтернативных каналов.</div>
+    </section>
+    <div class="footer">Файл подготовлен для управленческой защиты бюджета. Назначение: поддержка обсуждения и принятия решений.</div>
+  </main>
+</div>
+<script>
+const base = {
+  revenue: 854.287823,
+  cogs: 201.936639,
+  prodOverhead: 83.3,
+  mp: 475.339545,
+  commercial: 18.7,
+  admin: 12.4,
+  op: 62.987883,
+  net: 22.261045,
+  taxCharges: 40.726838,
+  cashFlow: 11.865199,
+  cashStart: 1.385,
+  taxPaid: 45.241784
+};
+const scenarioParams = {
+  pessimistic: {rev:-8, units:-10, mp:2, material:6, work:3, tax:5},
+  base: {rev:0, units:0, mp:0, material:0, work:0, tax:0},
+  optimistic: {rev:6, units:5, mp:-2, material:-3, work:-2, tax:-3}
+};
+const months = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+const monthRevenue = [77.6,91.9,126.8,50.8,50.1,49.3,53.1,57.3,50.8,62.7,82.0,101.8];
+const monthCash = [5.4,-3.4,20.0,15.4,-1.0,-2.6,-8.2,2.3,-0.1,-13.0,-7.9,4.8];
+const sku = [
+ {name:'Автопарфюм', price:751, cost:96, plan:110295, wb:343, oz:129, action:'сохранять, проверить цену сырья'},
+ {name:'Конфеты 9 шт.', price:854, cost:167, plan:165442, wb:332, oz:89, action:'Ozon ограничить промо'},
+ {name:'Набор свечей', price:757, cost:265, plan:220590, wb:177, oz:-38, action:'Ozon стоп, WB развивать осторожно'},
+ {name:'СПА-набор', price:1225, cost:512, plan:220590, wb:204, oz:-145, action:'пересборка, Ozon вывести'},
+ {name:'Набор чая', price:810, cost:210, plan:220590, wb:263, oz:32, action:'WB масштаб, Ozon лайт-версия'},
+ {name:'Шоколадка', price:652, cost:68, plan:165442, wb:313, oz:127, action:'масштабировать, контролировать шоколад'}
+];
+const taxes = [
+ ['НДФЛ ИП',16.609,15.498],['УСН 15%',12.750,10.983],['Взносы 1%',1.138,0.937],['НДС 5%',9.950,7.978],['НДС ОСНО',13.212,9.846]
+];
+let currentScenario='base';
+function fmt(v,d=1){return Number(v).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function pct(v){return fmt(v*100,1)+'%';}
+function getState(){
+ const s = scenarioParams[currentScenario];
+ const priceDelta = +document.getElementById('priceDelta').value/100;
+ const materialDelta = (+document.getElementById('materialDelta').value + s.material)/100;
+ const workDelta = (+document.getElementById('workDelta').value + s.work)/100;
+ const mpDelta = (+document.getElementById('mpDelta').value + s.mp)/100;
+ const taxDelta = (+document.getElementById('taxDelta').value + s.tax)/100;
+ const unitMult = (1 + (s.units/100)) * (1 - priceDelta*0.40);
+ const priceMult = 1 + priceDelta;
+ const revenue = base.revenue * (1 + s.rev/100) * unitMult * priceMult;
+ const cogs = base.cogs * unitMult * (1 + materialDelta);
+ const prodOverhead = base.prodOverhead * unitMult * (1 + workDelta);
+ const mpRate = base.mp/base.revenue + mpDelta;
+ const mp = revenue * Math.max(0.35, Math.min(0.75, mpRate));
+ const commercial = base.commercial * (0.65 + 0.35*(revenue/base.revenue));
+ const admin = base.admin;
+ const mr1 = revenue - cogs - prodOverhead;
+ const mr2 = mr1 - mp;
+ const op = mr2 - commercial - admin;
+ const taxCharges = base.taxCharges * (1 + taxDelta);
+ const net = op - taxCharges;
+ const cashFlow = base.cashFlow + (net - base.net)*0.55 - Math.max(0,unitMult-1)*10 - Math.max(0,materialDelta)*5;
+ return {revenue,cogs,prodOverhead,mp,commercial,admin,mr1,mr2,op,taxCharges,net,cashFlow,mpRate,unitMult,priceMult,materialDelta,workDelta,taxDelta};
+}
+function updateKpis(st){
+ const cashEnd = base.cashStart + st.cashFlow;
+ document.getElementById('kpiRevenue').textContent=fmt(st.revenue);
+ document.getElementById('kpiMr1').textContent=fmt(st.mr1);
+ document.getElementById('kpiMr1Pct').textContent=pct(st.mr1/st.revenue);
+ document.getElementById('kpiMp').textContent=fmt(st.mp);
+ document.getElementById('kpiMpPct').textContent=pct(st.mp/st.revenue);
+ document.getElementById('kpiMr2').textContent=fmt(st.mr2);
+ document.getElementById('kpiMr2Pct').textContent=pct(st.mr2/st.revenue);
+ document.getElementById('kpiOp').textContent=fmt(st.op);
+ document.getElementById('kpiOpPct').textContent=pct(st.op/st.revenue);
+ document.getElementById('kpiNet').textContent=fmt(st.net);
+ document.getElementById('kpiNetPct').textContent=pct(st.net/st.revenue);
+ document.getElementById('kpiCashFlow').textContent=fmt(st.cashFlow);
+ document.getElementById('kpiCashEnd').textContent=fmt(cashEnd);
+}
+function setLabels(){
+ const ids=['priceDelta','materialDelta','workDelta','taxDelta']; ids.forEach(id=>{document.getElementById(id+'Lbl').textContent=(+document.getElementById(id).value>0?'+':'')+document.getElementById(id).value+'%'});
+ document.getElementById('mpDeltaLbl').textContent=(+document.getElementById('mpDelta').value>0?'+':'')+document.getElementById('mpDelta').value+' п.п.';
+}
+function drawWaterfall(st){
+ const svg=document.getElementById('waterfallChart'); svg.innerHTML='';
+ const W=svg.clientWidth||900,H=svg.clientHeight||320,p=42;
+ const data=[['Выручка',st.revenue,'pos'],['Производство',-st.cogs-st.prodOverhead,'neg'],['МП',-st.mp,'neg'],['Комм. и упр.',-st.commercial-st.admin,'neg'],['Налоги и проч.',-st.taxCharges,'neg'],['Чистая прибыль',st.net, st.net>=0?'pos':'neg']];
+ const max=Math.max(st.revenue,Math.abs(st.net),900), scale=(H-80)/max;
+ let x=p, bw=(W-2*p)/data.length*.62, gap=(W-2*p)/data.length*.38, running=0;
+ data.forEach((d,i)=>{
+   let val=d[1], start=i===0||i===data.length-1?0:running, end=i===0?val:(i===data.length-1?val:running+val);
+   if(i>0 && i<data.length-1) running=end; if(i===0) running=val;
+   let y = H-p-Math.max(start,end)*scale, h=Math.abs(val)*scale;
+   if(i===data.length-1){y=H-p-Math.max(val,0)*scale;h=Math.abs(val)*scale;}
+   const color=d[2]==='pos'?'#35c48c':'#ff5c7a';
+   svg.insertAdjacentHTML('beforeend',`<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(2,h)}" rx="6" fill="${color}" opacity=".9"></rect>`);
+   svg.insertAdjacentHTML('beforeend',`<text x="${x+bw/2}" y="${H-18}" text-anchor="middle" class="bar-label">${d[0]}</text>`);
+   svg.insertAdjacentHTML('beforeend',`<text x="${x+bw/2}" y="${y-6}" text-anchor="middle" class="bar-label">${fmt(val)}</text>`);
+   x+=bw+gap;
+ });
+}
+function drawExpense(st){
+ const svg=document.getElementById('expenseChart'); svg.innerHTML='';
+ const rows=[['Производство',st.cogs+st.prodOverhead,'#5aa7ff'],['Маркетплейсы',st.mp,'#ff5c7a'],['Коммерческие',st.commercial,'#ffd166'],['Управленческие',st.admin,'#35c48c'],['Налоги и проч.',st.taxCharges,'#a78bfa']];
+ const W=svg.clientWidth||520,H=svg.clientHeight||360,p=22; const max=Math.max(...rows.map(r=>r[1]));
+ rows.forEach((r,i)=>{let y=p+i*58, w=(W-160)*r[1]/max;svg.insertAdjacentHTML('beforeend',`<text x="${p}" y="${y+20}" class="bar-label">${r[0]}</text><rect x="150" y="${y}" width="${w}" height="26" rx="7" fill="${r[2]}"></rect><text x="${155+w}" y="${y+18}" class="bar-label">${fmt(r[1])} млн (${pct(r[1]/st.revenue)})</text>`)});
+}
+function drawMonthly(st){
+ const svg=document.getElementById('monthlyChart'); svg.innerHTML=''; const W=svg.clientWidth||900,H=svg.clientHeight||320,p=42;
+ const revFactor=st.revenue/base.revenue; const cfFactor=st.cashFlow/base.cashFlow;
+ const rev=monthRevenue.map(v=>v*revFactor); const cf=monthCash.map(v=>v*cfFactor);
+ const max=Math.max(...rev), min=Math.min(...cf,0), maxCf=Math.max(...cf,0); const y0=H-p-(0-min)/(Math.max(max,maxCf)-min)*(H-70);
+ const bw=(W-2*p)/months.length*.55; const gap=(W-2*p)/months.length*.45;
+ months.forEach((m,i)=>{let x=p+i*(bw+gap); let rh=rev[i]/max*(H-80); let y=H-p-rh; svg.insertAdjacentHTML('beforeend',`<rect x="${x}" y="${y}" width="${bw}" height="${rh}" rx="5" fill="#5aa7ff" opacity=".75"></rect><text x="${x+bw/2}" y="${H-14}" text-anchor="middle" class="bar-label">${m}</text>`);});
+ let pts=cf.map((v,i)=>{let x=p+i*(bw+gap)+bw/2; let y=H-p-(v-min)/(max-min)*(H-80); return [x,y];});
+ svg.insertAdjacentHTML('beforeend',`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#ffb347" stroke-width="3"/>`);
+ pts.forEach((pt,i)=>svg.insertAdjacentHTML('beforeend',`<circle cx="${pt[0]}" cy="${pt[1]}" r="4" fill="#ffb347"></circle>`));
+ svg.insertAdjacentHTML('beforeend',`<text x="${p}" y="20" class="bar-label">Синие столбцы - выручка, желтая линия - денежный поток</text>`);
+}
+function skuComputed(st){
+ return sku.map(s=>{
+   const price=s.price*st.priceMult;
+   const cost=s.cost*(0.78*(1+st.materialDelta)+0.22*(1+st.workDelta))*st.unitMult;
+   const wbExpBase=s.price-s.cost-s.wb; const ozExpBase=s.price-s.cost-s.oz;
+   const wbExp=wbExpBase*(1+(st.mpRate-base.mp/base.revenue)*0.8);
+   const ozExp=ozExpBase*(1+(st.mpRate-base.mp/base.revenue)*0.9);
+   const wb=price-cost-wbExp; const oz=price-cost-ozExp;
+   return {...s,price,cost,wb,oz,wbPct:wb/price,ozPct:oz/price};
+ });
+}
+function drawSku(st){
+ const data=skuComputed(st); const svg=document.getElementById('skuChart'); svg.innerHTML=''; const W=svg.clientWidth||520,H=svg.clientHeight||420,p=62;
+ const max=0.55,min=-0.18,scale=(W-180)/(max-min),zero=p+(-min)*scale;
+ svg.insertAdjacentHTML('beforeend',`<line x1="${zero}" x2="${zero}" y1="25" y2="${H-25}" stroke="rgba(255,255,255,.25)"/><text x="${zero+4}" y="18" class="bar-label">0%</text>`);
+ data.forEach((s,i)=>{let y=36+i*58; [['WB',s.wbPct,'#35c48c'],['Ozon',s.ozPct,'#ff5c7a']].forEach((b,j)=>{let val=b[1], w=Math.abs(val)*scale, x=val>=0?zero:zero-w; let yy=y+j*23; svg.insertAdjacentHTML('beforeend',`<rect x="${x}" y="${yy}" width="${w}" height="16" rx="4" fill="${b[2]}"></rect><text x="${val>=0?x+w+4:x-4}" y="${yy+12}" text-anchor="${val>=0?'start':'end'}" class="bar-label">${b[0]} ${fmt(val*100,1)}%</text>`);}); svg.insertAdjacentHTML('beforeend',`<text x="10" y="${y+25}" class="bar-label">${s.name}</text>`);});
+}
+function fillTables(st){
+ const rows=[['Выручка',st.revenue,'100%','план продаж по данным бюджета'],['Себестоимость',st.cogs,pct(st.cogs/st.revenue),'материалы и прямые затраты'],['Общепроизводственные',st.prodOverhead,pct(st.prodOverhead/st.revenue),'цех, обслуживание, производственная поддержка'],['Расходы маркетплейсов',st.mp,pct(st.mp/st.revenue),'комиссии, логистика, продвижение, хранение'],['Коммерческие',st.commercial,pct(st.commercial/st.revenue),'расходы продаж вне МП'],['Управленческие',st.admin,pct(st.admin/st.revenue),'офис, управление, бухгалтерия'],['Операционная прибыль',st.op,pct(st.op/st.revenue),'прибыль до налогов и прочих платежей'],['Чистая прибыль',st.net,pct(st.net/st.revenue),'итоговый результат']];
+ document.getElementById('pnlTable').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="num">${fmt(r[1])}</td><td class="num">${r[2]}</td><td>${r[3]}</td></tr>`).join('');
+ document.getElementById('skuTable').innerHTML=skuComputed(st).map(s=>{let cl=s.ozPct<0?'bad':s.ozPct<.15?'warn':'good';return `<tr><td>${s.name}</td><td class="num">${fmt(s.price,0)}</td><td class="num">${fmt(s.cost,0)}</td><td class="num"><span class="pill ${s.wbPct<.15?'warn':'good'}">${fmt(s.wb,0)} / ${fmt(s.wbPct*100,1)}%</span></td><td class="num"><span class="pill ${cl}">${fmt(s.oz,0)} / ${fmt(s.ozPct*100,1)}%</span></td><td>${s.action}</td></tr>`}).join('');
+ document.getElementById('taxTable').innerHTML=taxes.map(t=>`<tr><td>${t[0]}</td><td class="num">${fmt(t[1])}</td><td class="num">${fmt(t[2])}</td></tr>`).join('')+`<tr><td><b>Итого</b></td><td class="num"><b>${fmt(taxes.reduce((a,b)=>a+b[1],0))}</b></td><td class="num"><b>${fmt(taxes.reduce((a,b)=>a+b[2],0))}</b></td></tr>`;
+}
+function drawCostSensitivity(st){
+ const svg=document.getElementById('costSensitivityChart'); svg.innerHTML=''; const W=svg.clientWidth||520,H=svg.clientHeight||320,p=42;
+ const metrics=[['MR2',st.mr2/st.revenue,'#35c48c'],['Опер. маржа',st.op/st.revenue,'#5aa7ff'],['Чистая маржа',st.net/st.revenue,st.net>=0?'#35c48c':'#ff5c7a']];
+ metrics.forEach((m,i)=>{let y=60+i*65,w=(W-180)*Math.max(-.1,Math.min(.35,m[1]+.1))/.45;let x=150;svg.insertAdjacentHTML('beforeend',`<text x="20" y="${y+18}" class="bar-label">${m[0]}</text><rect x="${x}" y="${y}" width="${w}" height="28" rx="8" fill="${m[2]}"></rect><text x="${x+w+8}" y="${y+19}" class="bar-label">${fmt(m[1]*100,1)}%</text>`)});
+ svg.insertAdjacentHTML('beforeend',`<text x="20" y="25" class="bar-label">Себестоимость влияет на MR2 сильнее всего через красные SKU: СПА, свечи, чай на Ozon</text>`);
+}
+function drawCashMovement(st){
+ const svg=document.getElementById('cashMovementChart'); if(!svg) return; svg.innerHTML='';
+ const W=svg.clientWidth||900,H=svg.clientHeight||320,p=46;
+ const baseSum=monthCash.reduce((a,b)=>a+b,0);
+ const adj=(st.cashFlow-baseSum)/12;
+ const cf=monthCash.map(v=>v+adj);
+ let bal=[],run=base.cashStart; cf.forEach(v=>{run+=v; bal.push(run);});
+ const maxVal=Math.max(...cf,...bal,base.cashStart,0);
+ const minVal=Math.min(...cf,...bal,0);
+ const range=maxVal-minVal || 1;
+ const y=v=>H-p-(v-minVal)/range*(H-82);
+ const zero=y(0);
+ const bw=(W-2*p)/months.length*.56;
+ const gap=(W-2*p)/months.length*.44;
+ svg.insertAdjacentHTML('beforeend',`<line x1="${p}" x2="${W-p}" y1="${zero}" y2="${zero}" stroke="rgba(255,255,255,.22)"/>`);
+ months.forEach((m,i)=>{
+   let x=p+i*(bw+gap); let v=cf[i]; let yy=v>=0?y(v):zero; let hh=Math.abs(y(v)-zero);
+   let color=v>=0?'#35c48c':'#ff5c7a';
+   svg.insertAdjacentHTML('beforeend',`<rect x="${x}" y="${yy}" width="${bw}" height="${Math.max(2,hh)}" rx="5" fill="${color}" opacity=".85"></rect>`);
+   svg.insertAdjacentHTML('beforeend',`<text x="${x+bw/2}" y="${H-14}" text-anchor="middle" class="bar-label">${m}</text>`);
+ });
+ const pts=bal.map((v,i)=>[p+i*(bw+gap)+bw/2,y(v)]);
+ svg.insertAdjacentHTML('beforeend',`<polyline points="${pts.map(t=>t.join(',')).join(' ')}" fill="none" stroke="#ffb347" stroke-width="3"/>`);
+ pts.forEach((pt,i)=>svg.insertAdjacentHTML('beforeend',`<circle cx="${pt[0]}" cy="${pt[1]}" r="4" fill="#ffb347"></circle>`));
+ svg.insertAdjacentHTML('beforeend',`<text x="${p}" y="20" class="bar-label">Движение денег: поток по месяцам и накопительный остаток</text>`);
+ svg.insertAdjacentHTML('beforeend',`<text x="${W-p}" y="20" text-anchor="end" class="bar-label">Конец года: ${fmt(bal[bal.length-1])} млн руб.</text>`);
+}
+function drawTax(st){
+ const svg=document.getElementById('taxChart'); svg.innerHTML=''; const W=svg.clientWidth||520,H=svg.clientHeight||320,p=42;
+ const vals=[['Опер. прибыль',st.op,'#5aa7ff'],['Налоги и проч.',-st.taxCharges,'#ff5c7a'],['Чистая прибыль',st.net,st.net>=0?'#35c48c':'#ff5c7a'],['Чистый ДП',st.cashFlow,st.cashFlow>=0?'#35c48c':'#ffb347']];
+ const max=Math.max(...vals.map(v=>Math.abs(v[1])),70); const bw=(W-2*p)/vals.length*.58; const gap=(W-2*p)/vals.length*.42; const zero=H/2;
+ vals.forEach((v,i)=>{let x=p+i*(bw+gap), h=Math.abs(v[1])/max*(H/2-35), y=v[1]>=0?zero-h:zero;svg.insertAdjacentHTML('beforeend',`<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="7" fill="${v[2]}"></rect><text x="${x+bw/2}" y="${H-15}" text-anchor="middle" class="bar-label">${v[0]}</text><text x="${x+bw/2}" y="${y-7}" text-anchor="middle" class="bar-label">${fmt(v[1])}</text>`)});
+ svg.insertAdjacentHTML('beforeend',`<line x1="${p}" x2="${W-p}" y1="${zero}" y2="${zero}" stroke="rgba(255,255,255,.18)"/>`);
+}
+function updateAll(){setLabels(); const st=getState(); updateKpis(st); drawWaterfall(st); drawExpense(st); drawMonthly(st); drawCashMovement(st); drawSku(st); fillTables(st); drawCostSensitivity(st); drawTax(st);}
+document.querySelectorAll('[data-scenario]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-scenario]').forEach(x=>x.classList.remove('active'));b.classList.add('active');currentScenario=b.dataset.scenario;updateAll();}));
+['priceDelta','materialDelta','workDelta','mpDelta','taxDelta'].forEach(id=>document.getElementById(id).addEventListener('input',updateAll));
+window.addEventListener('resize',updateAll); updateAll();
+</script>
+</body>
+</html>
